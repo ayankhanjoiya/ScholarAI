@@ -3,6 +3,7 @@ load_dotenv()
 
 from google import genai
 from google.genai import types
+from tools.basic_tools import get_current_year
 
 client = genai.Client()
 
@@ -32,6 +33,9 @@ response = client.models.generate_content(
 if response.function_calls:
     for call in response.function_calls:
         print(f"Gemini requested tool call: {call.name}({call.args})")
+        if call.name== "get_current_year":
+            result = get_current_year()
+            print("Tool Result:",result)
 else:
     print(response.text)
 
