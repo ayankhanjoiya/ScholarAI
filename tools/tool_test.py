@@ -1,18 +1,37 @@
-import os
-from google import genai
 from dotenv import load_dotenv
-from tools.basic_tools import get_current_year
-
 load_dotenv()
-client = genai.Client(
-    api_key=os.getenv("GOOGLE_API_KEY")
+
+from google import genai
+from google.genai import types
+
+client = genai.Client()
+
+get_current_year_tool = types.FunctionDeclaration(
+    name="get_current_year",
+    description="Returns the current calendar year.",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={},
+    ),
+)
+
+tool = types.Tool(
+    function_declarations=[get_current_year_tool]
+)
+
+config = types.GenerateContentConfig(
+    tools=[tool]
 )
 
 response = client.models.generate_content(
-        model = "gemini-3.5-flash",
-        contents = "what is the current year?",
-        config = {
-            "tools" : [get_current_year]
-        }
+    model="gemini-2.5-flash", 
+    contents="What year is it?",
+    config=config,
 )
-print(response.text)
+
+if response.function_calls:
+    for call in response.function_calls:
+        print(f"Gemini requested tool call: {call.name}({call.args})")
+else:
+    print(response.text)
+
