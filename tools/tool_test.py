@@ -24,41 +24,53 @@ config = types.GenerateContentConfig(
     tools=[tool]
 )
 
+contents = [
+    types.Content(
+        role="user",
+        parts=[
+            types.Part.from_text(text="What year is it?")
+        ]
+    )
+]
+
 response = client.models.generate_content(
-    model="gemini-2.5-flash", 
-    contents="What is the capital of France?",
+    model="gemini-3.5-flash",
+    contents=contents,
     config=config,
 )
 
-if response.function_calls:
+while response.function_calls:
+
+    tool_results = []
+
     for call in response.function_calls:
+
         print(f"Gemini requested tool call: {call.name}({call.args})")
-        if call.name== "get_current_year":
+
+        if call.name == "get_current_year":
             result = get_current_year()
-            print("Tool Result:",result)
-        tool_response = types.Part.from_function_response(
-            name="get_current_year",
-            response={"result":result},
-        )
 
-        response = client.models.generate_content(
-            model="gemini-3.5-flash",
-            contents = [
-                "What year is it?",
-                response.candidates[0].content,
-                types.Content(
-                    role="user",
-                    parts=[
-                        types.Part.from_function_response(
-                            name=call.name,
-                            response={"result": result},
-                        )
-                    ],
-                ),
-            ],
-            config=config
-        )
-        print("Final answer :" ,response.text)
-else:
-    print(response.text)
+            print("Tool Result:", result)
 
+            tool_response = types.Part.from_function_response(
+                name=call.name,
+                response={"result": result}
+            )
+
+            tool_results.append(tool_response)
+
+    contents.append(response.candidates[0].content)
+
+    contents.append(
+        types.Content(
+            role="user",
+            parts=tool_results
+        )
+    )
+
+    response = client.models.generate_content(
+        model="gemini-3.5-flash",
+        contents=contents,
+        config=config
+    )
+print("Final answer :" ,response.text)
