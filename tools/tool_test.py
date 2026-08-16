@@ -3,29 +3,26 @@ load_dotenv()
 
 from google import genai
 from google.genai import types
-from tools.basic_tools import get_current_year,get_current_month
+from tools.web_tools import web_search
 
 client = genai.Client()
 
-get_current_year_tool = types.FunctionDeclaration(
-    name="get_current_year",
-    description="Returns the current calendar year.",
-    parameters=types.Schema(
-        type=types.Type.OBJECT,
-        properties={},
-    ),
-)
-
-get_current_month_tool = types.FunctionDeclaration(
-    name="get_current_month",
-    description="Returns the current calendar month",
-    parameters=types.Schema(
-        type=types.Type.OBJECT,
-        properties={},
-    ),
+web_search_tool = types.FunctionDeclaration(
+    name = "web_search",
+    description = "Searches the web and returns relevant search results for a given query.",
+    parameters = types.Schema(
+        type = types.Type.OBJECT,
+        properties={
+            "query": types.Schema(
+                type = types.Type.STRING,
+                description = "The search query to use"
+            )
+        },
+        required=["query"],
+    )
 )
 tool = types.Tool(
-    function_declarations=[get_current_year_tool,get_current_month_tool]
+    function_declarations=[web_search_tool]
 )
 
 config = types.GenerateContentConfig(
@@ -36,7 +33,7 @@ contents = [
     types.Content(
         role="user",
         parts=[
-            types.Part.from_text(text="What year and month is it?"),     
+            types.Part.from_text(text="What are the latest developments in Retrieval-Augmented Generation?"),     
         ]
     )
 ]
@@ -55,8 +52,9 @@ while response.function_calls:
 
         print(f"Gemini requested tool call: {call.name}({call.args})")
 
-        if call.name == "get_current_year":
-            result = get_current_year()
+        if call.name == "web_search":
+            query = call.args["query"]
+            result = web_search(query)
 
             print("Tool Result:", result)
 
@@ -65,16 +63,6 @@ while response.function_calls:
                 response={"result": result}
             )
 
-            tool_results.append(tool_response)
-        
-        elif call.name == "get_current_month":
-            result = get_current_month()
-            print("Tool Result:",result)
-
-            tool_response = types.Part.from_function_response(
-                name=call.name,
-                response={"result": result},
-            )
             tool_results.append(tool_response)
 
     contents.append(response.candidates[0].content)
