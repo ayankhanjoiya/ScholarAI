@@ -12,8 +12,16 @@ client = genai.Client(
 topic = input("Enter your research topic: ")
 
 research_plan = plan(client,topic)
-results = {}
+results = []
 for question in research_plan.sub_questions:
-    results[question] = (research(client,question))
+    result={
+        "question" : question,
+        "answer" : research(client,question)
+    }
+    results.append(result)
+evidence = {
+    "topic": topic,
+    "research_results": results
+}
 
-print(results)
+print(evidence)

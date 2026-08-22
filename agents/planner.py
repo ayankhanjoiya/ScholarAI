@@ -2,7 +2,7 @@ from pydantic import BaseModel
 class ResearchPlan(BaseModel):
     topic:str
     sub_questions: list[str]
-
+## have chnaged the sub-questions from 4 to 2 but have to undo them
 def plan(client,topic):
     response = client.models.generate_content(
         model = "gemini-3.5-flash",
