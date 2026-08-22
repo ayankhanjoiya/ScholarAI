@@ -2,6 +2,8 @@ import os
 from dotenv import load_dotenv
 from google import genai
 from agents.planner import plan
+from agents.researcher import research
+
 load_dotenv()
 
 client = genai.Client(
@@ -9,4 +11,9 @@ client = genai.Client(
 )
 topic = input("Enter your research topic: ")
 
-print(plan(client,topic))
+research_plan = plan(client,topic)
+results = {}
+for question in research_plan.sub_questions:
+    results[question] = (research(client,question))
+
+print(results)

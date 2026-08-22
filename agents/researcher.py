@@ -1,12 +1,6 @@
-from dotenv import load_dotenv
-load_dotenv()
-
-from google import genai
 from google.genai import types
 from tools.web_tools import web_search
 from tools.basic_tools import get_current_year
-
-client = genai.Client()
 
 web_search_tool = types.FunctionDeclaration(
     name = "web_search",
@@ -80,14 +74,8 @@ def research(client,question):
         )
         
         response=client.models.generate_content(
-            model="gemini-3.6-flash",
+            model="gemini-3.5-flash-lite",
             contents=contents,
             config=config,
         )
     return response.text
-
-question= "What are the latest developments in RAG?"
-
-answer = research(client, question)
-
-print("Final answer:", answer)
