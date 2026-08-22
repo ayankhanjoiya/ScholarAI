@@ -1,6 +1,7 @@
 from google.genai import types
 from tools.web_tools import web_search
 from tools.basic_tools import get_current_year
+from tools.paper_tools import search_papers
 
 web_search_tool = types.FunctionDeclaration(
     name = "web_search",
@@ -21,8 +22,22 @@ get_current_year_tool = types.FunctionDeclaration(
     description = "gives us the current year",
     parameters={},
 )
+paper_search_tool = types.FunctionDeclaration(
+    name="search_papers",
+    description="Searches for relevant academic papers and returns their title, publication year, DOI, and paper ID.",
+    parameters=types.Schema(
+        type = types.Type.OBJECT,
+        properties={
+            "query": types.Schema(
+                type = types.Type.STRING,
+                description = "The search query to use"
+            )
+        },
+        required=["query"],
+        )
+)
 tool = types.Tool(
-    function_declarations=[web_search_tool,get_current_year_tool]
+    function_declarations=[web_search_tool,get_current_year_tool,paper_search_tool]
 )
 
 config = types.GenerateContentConfig(
@@ -46,6 +61,7 @@ def research(client,question):
     tool_registry = {
         "web_search": web_search,
         "get_current_year": get_current_year,
+        "search_papers":search_papers
     }
     while response.function_calls:
         tool_results=[]
