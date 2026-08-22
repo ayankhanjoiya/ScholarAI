@@ -29,54 +29,57 @@ config = types.GenerateContentConfig(
     tools=[tool]
 )
 
-contents = [
-    types.Content(
-        role="user",
-        parts=[
-            types.Part.from_text(text="What are the latest developments in Retrieval-Augmented Generation?"),     
-        ]
-    )
-]
-
-response = client.models.generate_content(
-    model="gemini-3.6-flash",
-    contents=contents,
-    config=config,
-)
-
-while response.function_calls:
-
-    tool_results = []
-
-    for call in response.function_calls:
-
-        print(f"Gemini requested tool call: {call.name}({call.args})")
-
-        if call.name == "web_search":
-            query = call.args["query"]
-            result = web_search(query)
-
-            print("Tool Result:", result)
-
-            tool_response = types.Part.from_function_response(
-                name=call.name,
-                response={"result": result}
-            )
-
-            tool_results.append(tool_response)
-
-    contents.append(response.candidates[0].content)
-
-    contents.append(
+def research(client,question):
+    contents =[
         types.Content(
             role="user",
-            parts=tool_results
+            parts=[
+                types.Part.from_text(text=question),
+            ]
         )
-    )
-
+    ]
     response = client.models.generate_content(
         model="gemini-3.6-flash",
         contents=contents,
-        config=config
+        config=config,
     )
-print("Final answer :" ,response.text)
+
+    while response.function_calls:
+        tool_results=[]
+
+        for call in response.function_calls:
+            print(f"Gemini requested tool call: {call.name}({call.args})")
+
+            if call.name == "web_search":
+                query = call.args["query"]
+                result = web_search(query)
+
+                print("Tool Result:" , result)
+
+                tool_response = types.Part.from_function_response(
+                    name=call.name,
+                    response={"result":result}
+                )
+                tool_results.append(tool_response)
+        
+        contents.append(response.candidates[0].content)
+
+        contents.append(
+            types.Content(
+                role="user",
+                parts=tool_results,
+            )
+        )
+        
+        response=client.models.generate_content(
+            model="gemini-3.6-flash",
+            contents=contents,
+            config=config,
+        )
+    return response.text
+
+question = "What are the latest developments in Retrieval-Augmented Generation?"
+
+answer = research(client, question)
+
+print("Final answer:", answer)
