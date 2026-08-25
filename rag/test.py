@@ -21,19 +21,30 @@ client = genai.Client()
 
 from rag.retriever import retrieve
 
-query = "What architecture does the paper propose?"
+query = "What programming language was used to implement the Transformer?"
 
 results = retrieve(
     client,
     query
 )
 
-for i, document in enumerate(results["documents"][0]):
+# for i, document in enumerate(results["documents"][0]):
 
-    metadata = results["metadatas"][0][i]
+#     metadata = results["metadatas"][0][i]
 
-    print(f"\n--- Result {i + 1} ---")
-    print("Page:", metadata["page_num"])
-    print("Chunk ID:", metadata["chunk_id"])
-    print(document[:500])
+#     print(f"\n--- Result {i + 1} ---")
+#     print("Page:", metadata["page_num"])
+#     print("Chunk ID:", metadata["chunk_id"])
+#     print(document[:500])
+
+from rag.generator import generate_answer
+
+answer = generate_answer(
+    client,
+    query,
+    results
+)
+
+print("\nAnswer:")
+print(answer)
 
