@@ -19,23 +19,21 @@ client = genai.Client()
 
 # print("Chunks stored:", collection.count())
 
+from rag.retriever import retrieve
+
 query = "What architecture does the paper propose?"
 
-response = client.models.embed_content(
-    model="gemini-embedding-001",
-    contents=query
+results = retrieve(
+    client,
+    query
 )
 
-query_embedding = response.embeddings[0].values
-
-from rag.vector_store import search
-
-results = search(query_embedding)
-
 for i, document in enumerate(results["documents"][0]):
+
     metadata = results["metadatas"][0][i]
+
     print(f"\n--- Result {i + 1} ---")
-    print(document[:500])
     print("Page:", metadata["page_num"])
     print("Chunk ID:", metadata["chunk_id"])
+    print(document[:500])
 
