@@ -33,5 +33,12 @@ def add_chunks(chunks):
             metadatas=metadatas,
         )
     
-def
+def search(query_embedding, n_results=3):
+    results = collection.query(
+        query_embeddings=[query_embedding],
+        n_results=n_results
+    )
+
+    return results
+
     
