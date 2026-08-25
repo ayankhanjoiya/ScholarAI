@@ -2,3 +2,4 @@ python-dotenv
 google-genai
 tavily-python
 pymupdf
+chromadb
