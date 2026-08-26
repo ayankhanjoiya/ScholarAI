@@ -1,9 +1,9 @@
-# from dotenv import load_dotenv
-# load_dotenv()
+from dotenv import load_dotenv
+load_dotenv()
 
-# from google import genai
+from google import genai
 
-# client = genai.Client()
+client = genai.Client()
 
 # from rag.pdf_loader import load_pdf
 # from rag.chunker import chunk
@@ -29,7 +29,7 @@
 
 from rag.retriever import retrieve
 
-query = "What programming language was used to implement the Transformer?"
+query = "How does BERT use bidirectional context?"
 
 results = retrieve(
     query
