@@ -1,50 +1,58 @@
+# from dotenv import load_dotenv
+# load_dotenv()
+
+# from google import genai
+
+# client = genai.Client()
+
 # from rag.pdf_loader import load_pdf
 # from rag.chunker import chunk
 # from rag.embeddings import embed_chunks
 # from rag.vector_store import add_chunks,collection
 
 # pages = load_pdf("C:\\study material\\ScholarAI\\data\\paper.pdf")
-# chunks = chunk(pages)
+# paper_id = "attention_is_all_you_need"
+# title = "Attention Is All You Need"
 
-from dotenv import load_dotenv
-load_dotenv()
+# chunks = chunk(
+#     pages,
+#     paper_id,
+#     title
+# )
 
-from google import genai
-
-client = genai.Client()
-
-# embedded_chunks = embed_chunks(chunks,client)
+# embedded_chunks = embed_chunks(chunks)
 
 # add_chunks(embedded_chunks)
 
 # print("Chunks stored:", collection.count())
+
 
 from rag.retriever import retrieve
 
 query = "What programming language was used to implement the Transformer?"
 
 results = retrieve(
-    client,
     query
 )
 
-# for i, document in enumerate(results["documents"][0]):
+for i, document in enumerate(results["documents"][0]):
 
-#     metadata = results["metadatas"][0][i]
+    metadata = results["metadatas"][0][i]
 
-#     print(f"\n--- Result {i + 1} ---")
-#     print("Page:", metadata["page_num"])
-#     print("Chunk ID:", metadata["chunk_id"])
-#     print(document[:500])
+    print(f"\n--- Result {i + 1} ---")
+    print("Page:", metadata["page_num"])
+    print("Paper ID:", metadata["paper_id"])
+    print("Title:",metadata["title"])
+    print(document[:500])
 
-from rag.generator import generate_answer
+# from rag.generator import generate_answer
 
-answer = generate_answer(
-    client,
-    query,
-    results
-)
+# answer = generate_answer(
+#     client,
+#     query,
+#     results
+# )
 
-print("\nAnswer:")
-print(answer)
+# print("\nAnswer:")
+# print(answer)
 

@@ -23,16 +23,17 @@ def add_chunks(chunks):
 
         metadatas.append({
             "page_num" : chunk["page_num"],
-            "chunk_id" : chunk["chunk_id"],
+            "paper_id" : chunk["paper_id"],
+            "title": chunk["title"],
         })
 
-        collection.add(
+    collection.add(
             ids=ids,
             documents=documents,
             embeddings=embeddings,
             metadatas=metadatas,
         )
-    
+        
 def search(query_embedding, n_results=3):
     results = collection.query(
         query_embeddings=[query_embedding],

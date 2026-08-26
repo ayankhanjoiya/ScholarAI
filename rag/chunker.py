@@ -1,4 +1,4 @@
-def chunk(pages : list):
+def chunk(pages : list,paper_id : str,title: str):
     chunks = []
     chunk_size = 1000
     overlap = 200
@@ -11,8 +11,10 @@ def chunk(pages : list):
             end = start + chunk_size
             chunk_text = text[start:end]
             chunks.append({
+                "paper_id":paper_id,
+                "title":title,
                 "page_num":page_num,
-                "chunk_id":chunk_id,
+                "chunk_id":f"{paper_id}_{chunk_id}",
                 "chunk_text":chunk_text
             })
             chunk_id += 1
