@@ -2,6 +2,7 @@ from google.genai import types
 from tools.web_tools import web_search
 from tools.basic_tools import get_current_year
 from tools.paper_tools import search_papers
+from rag.retriever import retrieve_documents
 
 web_search_tool = types.FunctionDeclaration(
     name = "web_search",
@@ -36,8 +37,21 @@ paper_search_tool = types.FunctionDeclaration(
         required=["query"],
         )
 )
+retrieve_documents_tool = types.FunctionDeclaration(
+    name="retrieve_documents",
+    description="Searches the locally stored research papers for relevant evidence and returns the paper title, page number, paper ID, and content.",
+    parameters = types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "query": types.Schema(
+                type=types.Type.STRING,
+                description="The research question or query to search for")
+        },
+        required=["query"],
+    )
+)
 tool = types.Tool(
-    function_declarations=[web_search_tool,get_current_year_tool,paper_search_tool]
+    function_declarations=[web_search_tool,get_current_year_tool,paper_search_tool,retrieve_documents_tool]
 )
 
 config = types.GenerateContentConfig(
@@ -61,7 +75,8 @@ def research(client,question):
     tool_registry = {
         "web_search": web_search,
         "get_current_year": get_current_year,
-        "search_papers":search_papers
+        "search_papers":search_papers,
+        "retrieve_documents":retrieve_documents,
     }
     while response.function_calls:
         tool_results=[]
