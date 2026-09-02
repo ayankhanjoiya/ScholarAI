@@ -25,7 +25,7 @@ get_current_year_tool = types.FunctionDeclaration(
 )
 paper_search_tool = types.FunctionDeclaration(
     name="search_papers",
-    description="Searches for relevant academic papers and returns their title, publication year, DOI, and paper ID.",
+    description="Searches OpenAlex to discover academic papers relevant to a topic. Use this when the user wants to find or discover papers.",
     parameters=types.Schema(
         type = types.Type.OBJECT,
         properties={
@@ -39,7 +39,7 @@ paper_search_tool = types.FunctionDeclaration(
 )
 retrieve_documents_tool = types.FunctionDeclaration(
     name="retrieve_documents",
-    description="Searches the locally stored research papers for relevant evidence and returns the paper title, page number, paper ID, and content.",
+    description="Searches the locally indexed research papers in ChromaDB and returns relevant text chunks as evidence. Use this when answering questions about the content of papers already stored in the local knowledge base.",
     parameters = types.Schema(
         type=types.Type.OBJECT,
         properties={
@@ -55,7 +55,22 @@ tool = types.Tool(
 )
 
 config = types.GenerateContentConfig(
-    tools=[tool]
+    tools=[tool],
+    system_instruction="""
+You are ScholarAI, a research assistant.
+
+When using retrieve_documents, treat the returned documents as evidence.
+Base factual claims about the retrieved papers on that evidence.
+
+For retrieved evidence, cite sources using:
+[Paper Title, p. Page Number]
+
+If the retrieved evidence does not contain enough information to answer,
+say that the available evidence is insufficient rather than hallucinating.
+
+When search_papers is used, use it for paper discovery.
+When retrieve_documents is used, use it for evidence from locally indexed papers.
+"""
 )
 
 def research(client,question):

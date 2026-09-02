@@ -30,7 +30,7 @@ def retrieve_documents(query : str):
             "paper_id": metadata['paper_id'],
             "title": metadata['title'], 
             "page_num": metadata['page_num'],
-            "content": documents,
+            "content": document,
         }
 
         evidence.append(source)

@@ -12,6 +12,7 @@ from tools.web_tools import web_search
 from tools.basic_tools import get_current_year
 from tools.paper_tools import search_papers
 from rag.retriever import retrieve_documents
+from agents.researcher import research
 
 web_search_tool = types.FunctionDeclaration(
     name = "web_search",
@@ -67,60 +68,7 @@ config = types.GenerateContentConfig(
     tools=[tool]
 )
 
-def research(client,question):
-    contents =[
-        types.Content(
-            role="user",
-            parts=[
-                types.Part.from_text(text=question),
-            ]
-        )
-    ]
-    response = client.models.generate_content(
-        model="gemini-3.5-flash-lite",
-        contents=contents,
-        config=config,
-    )
-    tool_registry = {
-        "web_search": web_search,
-        "get_current_year": get_current_year,
-        "search_papers":search_papers,
-        "retrieve_documents":retrieve_documents,
-    }
-    while response.function_calls:
-        tool_results=[]
-
-        for call in response.function_calls:
-            print(f"Gemini requested tool call: {call.name}({call.args})")
-
-            tool_function = tool_registry[call.name]
-            result = tool_function(**call.args)
-
-            print("Tool Result: " ,result)
-
-            tool_response = types.Part.from_function_response(
-                name=call.name,
-                response={"result":result}
-            )
-            tool_results.append(tool_response)
-        
-        contents.append(response.candidates[0].content)
-
-        contents.append(
-            types.Content(
-                role="user",
-                parts=tool_results,
-            )
-        )
-        
-        response=client.models.generate_content(
-            model="gemini-3.5-flash-lite",
-            contents=contents,
-            config=config,
-        )
-    return response.text
-
-question = "Find academic papers about recent advancements in Retrieval-Augmented Generation"
+question = "According to the BERT paper, how does masked language modeling work?"
 
 answer = research(client, question)
 
