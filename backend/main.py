@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from google import genai
 from agents.planner import plan
 from agents.researcher import research
+from agents.synthesizer import synthesize
 
 load_dotenv()
 
@@ -19,9 +20,11 @@ for question in research_plan.sub_questions:
         "answer" : research(client,question)
     }
     results.append(result)
-evidence = {
-    "topic": topic,
-    "research_results": results
-}
 
-print(evidence)
+final_answer = synthesize(
+    client,
+    topic,
+    results
+)
+
+print(final_answer)
